@@ -15,6 +15,7 @@ public:
 private:
 	friend class Singleton<Test>;
 	Test() = default;
+	~Test() = default;
 	Test(Test const&) = default;
 	Test(Test&&) noexcept = default;
 	Test& operator=(Test const&) = default;
