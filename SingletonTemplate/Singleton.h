@@ -23,8 +23,8 @@ private:
 	static std::weak_ptr<T> m_Instance;
 
 	// move construction/assign
-	Singleton(Singleton&&) = default;
-	Singleton& operator=(Singleton&&) = default;
+	Singleton(Singleton&&) noexcept = default;
+	Singleton& operator=(Singleton&&) noexcept = default;
 
 	static void swap(T& lhs, T& rhs);
 };

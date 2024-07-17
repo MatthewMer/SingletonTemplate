@@ -15,6 +15,10 @@ public:
 private:
 	friend class Singleton<Test>;
 	Test() = default;
+	Test(Test const&) = default;
+	Test(Test&&) noexcept = default;
+	Test& operator=(Test const&) = default;
+	Test& operator=(Test&&) noexcept = default;
 
 	int m_Value = 0;
 };

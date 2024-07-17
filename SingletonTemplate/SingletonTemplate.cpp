@@ -23,4 +23,16 @@ int main()
     cout << "Instance resetted (set to 0)" << endl;
     cout << "Shared pointer: " << sp->Get() << endl;
     cout << "Weak pointer: " << wp.lock()->Get() << endl;
+
+    i = 3;
+    sp->Set(i);
+    cout << "Value set to: " << i << endl;
+    cout << "Shared pointer: " << sp->Get() << endl;
+    cout << "Weak pointer: " << wp.lock()->Get() << endl;
+
+    cout << endl;
+    cout << "Is move assignable? "      << std::is_move_assignable<Test>::value << endl;
+    cout << "Is move constructible? "   << std::is_move_constructible<Test>::value << endl;
+    cout << "Is copy assignable? "      << std::is_copy_assignable<Test>::value << endl;
+    cout << "Is copy constructible? "   << std::is_copy_constructible<Test>::value << endl;
 }
