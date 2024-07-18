@@ -9,29 +9,25 @@ using std::cout, std::endl;
 
 int main()
 {
-    auto sp = Test::s_GetInstance();
-    std::weak_ptr<Test> wp = sp;
+    auto wp = Test::s_GetInstance();
     cout << "Instance created" << endl;
 
     int i = 5;
-    sp->Set(i);
+    wp.lock()->Set(i);
     cout << "Value set to: " << i << endl;
-    cout << "Shared pointer: " << sp->Get() << endl;
     cout << "Weak pointer: " << wp.lock()->Get() << endl;
 
     Test::s_ResetInstance();
     cout << "Instance resetted (set to 0)" << endl;
-    cout << "Shared pointer: " << sp->Get() << endl;
     cout << "Weak pointer: " << wp.lock()->Get() << endl;
 
     i = 3;
-    sp->Set(i);
+    wp.lock()->Set(i);
     cout << "Value set to: " << i << endl;
-    cout << "Shared pointer: " << sp->Get() << endl;
     cout << "Weak pointer: " << wp.lock()->Get() << endl;
 
     cout << endl;
-    cout << "Number of owners: " << sp.use_count() << endl;
+    cout << "Number of owners: " << wp.use_count() << endl;
 
     cout << endl;
     cout << "Is constructible? "        << std::is_constructible<Test>::value       << endl;
