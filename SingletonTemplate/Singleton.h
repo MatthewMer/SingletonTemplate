@@ -12,8 +12,8 @@ public:
 	static void s_ResetInstance();
 
 protected:
-	~Singleton() = default;
 	Singleton() = default;
+	virtual ~Singleton() = default;
 
 	// clone/assign protection
 	Singleton& operator=(Singleton const&) = default;
@@ -27,6 +27,15 @@ private:
 	Singleton& operator=(Singleton&&) noexcept = default;
 
 	static void swap(T& lhs, T& rhs);
+
+	struct hidden {};
+	virtual void inaccessible(hidden n) = 0;
+	template <class T>
+	class TImpl : public T {
+		void inaccessible(hidden) override {};
+	};
+
+	struct shared_enabler : TImpl<T> {};
 };
 
 template <class T>
@@ -37,7 +46,6 @@ std::shared_ptr<T> Singleton<T>::s_GetInstance() {
 	auto ptr = m_Instance.lock();
 
 	if (!ptr) {
-		struct shared_enabler : T {};
 		ptr = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
 		m_Instance = ptr;
 	}
@@ -50,14 +58,15 @@ void Singleton<T>::s_ResetInstance() {
 	auto ptr = m_Instance.lock();
 
 	if (ptr) {
-		T tmp;
-		swap(*ptr, tmp);
+		auto tmp = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
+		swap(*ptr, *tmp);
 	}
 }
 
 template <class T>
 void Singleton<T>::swap(T& lhs, T& rhs) {
-	T tmp = std::move(rhs);
+	auto tmp = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
+	*tmp = std::move(rhs);
 	rhs = std::move(lhs);
-	lhs = std::move(tmp);
+	lhs = std::move(*tmp);
 }
