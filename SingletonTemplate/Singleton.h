@@ -4,12 +4,14 @@
 ***************************************************************** */
 
 #include <memory>
+#include <mutex>
 
 template <class T>
 class Singleton {
 public:
 	static T* s_GetInstance();
 	static void s_ResetInstance();
+	static void s_ClearInstance();
 
 protected:
 	Singleton() = default;
@@ -36,13 +38,19 @@ private:
 	};
 
 	struct shared_enabler : public TImpl<T> {};
+
+	static std::mutex m_MutSingleton;
 };
 
 template <class T>
 std::unique_ptr<T> Singleton<T>::m_Instance = nullptr;
+template <class T>
+std::mutex Singleton<T>::m_MutSingleton;
 
 template <class T>
 T* Singleton<T>::s_GetInstance() {
+	std::lock_guard<std::mutex> lock(m_MutSingleton);
+
 	if (!m_Instance) {
 		auto instance = std::make_unique<shared_enabler>();
 		m_Instance = std::unique_ptr<T>(static_cast<T*>(instance.release()));
@@ -53,10 +61,25 @@ T* Singleton<T>::s_GetInstance() {
 
 template <class T>
 void Singleton<T>::s_ResetInstance() {
+	std::lock_guard<std::mutex> lock(m_MutSingleton);
+
+	auto instance = std::make_unique<shared_enabler>();
+
 	if (m_Instance) {
 		auto instance = std::make_unique<shared_enabler>();
 		swap(*m_Instance, *static_cast<T*>(instance.get()));
 		instance.release();
+	} else {
+		m_Instance = std::unique_ptr<T>(static_cast<T*>(instance.release()));
+	}
+}
+
+template <class T>
+void Singleton<T>::s_ClearInstance() {
+	std::lock_guard<std::mutex> lock(m_MutSingleton);
+
+	if (m_Instance) {
+		m_Instance.release();
 	}
 }
 
