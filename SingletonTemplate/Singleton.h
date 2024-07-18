@@ -8,7 +8,7 @@
 template <class T>
 class Singleton {
 public:
-	static std::weak_ptr<T> s_GetInstance();
+	static T* s_GetInstance();
 	static void s_ResetInstance();
 
 protected:
@@ -20,7 +20,7 @@ protected:
 	Singleton(Singleton const&) = default;
 
 private:
-	static std::shared_ptr<T> m_Instance;
+	static std::unique_ptr<T> m_Instance;
 
 	// move construction/assign
 	Singleton(Singleton&&) noexcept = default;
@@ -35,33 +35,37 @@ private:
 		void inaccessible(hidden) override {};
 	};
 
-	struct shared_enabler : TImpl<T> {};
+	struct shared_enabler : public TImpl<T> {};
 };
 
 template <class T>
-std::shared_ptr<T> Singleton<T>::m_Instance;
+std::unique_ptr<T> Singleton<T>::m_Instance = nullptr;
 
 template <class T>
-std::weak_ptr<T> Singleton<T>::s_GetInstance() {
+T* Singleton<T>::s_GetInstance() {
 	if (!m_Instance) {
-		m_Instance = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
+		auto instance = std::make_unique<shared_enabler>();
+		m_Instance = std::unique_ptr<T>(static_cast<T*>(instance.release()));
 	}
 
-	return m_Instance;
+	return m_Instance.get();
 }
 
 template <class T>
 void Singleton<T>::s_ResetInstance() {
 	if (m_Instance) {
-		auto tmp = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
-		swap(*m_Instance, *tmp);
+		auto instance = std::make_unique<shared_enabler>();
+		swap(*m_Instance, *static_cast<T*>(instance.get()));
+		instance.release();
 	}
 }
 
 template <class T>
 void Singleton<T>::swap(T& lhs, T& rhs) {
-	auto tmp = std::static_pointer_cast<T>(std::make_shared<shared_enabler>());
+	auto instance = std::make_unique<shared_enabler>();
+	auto* tmp = static_cast<T*>(instance.get());
 	*tmp = std::move(rhs);
 	rhs = std::move(lhs);
 	lhs = std::move(*tmp);
+	instance.release();
 }

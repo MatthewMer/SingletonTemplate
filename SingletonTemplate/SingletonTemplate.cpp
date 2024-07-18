@@ -9,25 +9,23 @@ using std::cout, std::endl;
 
 int main()
 {
-    auto wp = Test::s_GetInstance();
+    auto* ptr = Test::s_GetInstance();
     cout << "Instance created" << endl;
+    cout << "Raw pointer: " << ptr->Get() << endl;
 
     int i = 5;
-    wp.lock()->Set(i);
+    ptr->Set(i);
     cout << "Value set to: " << i << endl;
-    cout << "Weak pointer: " << wp.lock()->Get() << endl;
+    cout << "Raw pointer: " << ptr->Get() << endl;
 
     Test::s_ResetInstance();
     cout << "Instance resetted (set to 0)" << endl;
-    cout << "Weak pointer: " << wp.lock()->Get() << endl;
+    cout << "Raw pointer: " << ptr->Get() << endl;
 
     i = 3;
-    wp.lock()->Set(i);
+    ptr->Set(i);
     cout << "Value set to: " << i << endl;
-    cout << "Weak pointer: " << wp.lock()->Get() << endl;
-
-    cout << endl;
-    cout << "Number of owners: " << wp.use_count() << endl;
+    cout << "Raw pointer: " << ptr->Get() << endl;
 
     cout << endl;
     cout << "Is constructible? "        << std::is_constructible<Test>::value       << endl;
