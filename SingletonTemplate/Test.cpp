@@ -1,6 +1,6 @@
 #include "Test.h"
 
-void Test::Set(int i) {
+void Test::Set(const int& i) {
 	this->m_Value = i;
 }
 

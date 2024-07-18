@@ -31,6 +31,9 @@ int main()
     cout << "Weak pointer: " << wp.lock()->Get() << endl;
 
     cout << endl;
+    cout << "Number of owners: " << sp.use_count() << endl;
+
+    cout << endl;
     cout << "Is constructible? "        << std::is_constructible<Test>::value       << endl;
     cout << "Is destructible? "         << std::is_destructible<Test>::value        << endl;
     cout << "Is move assignable? "      << std::is_move_assignable<Test>::value     << endl;

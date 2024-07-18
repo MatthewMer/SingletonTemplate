@@ -9,7 +9,7 @@
 
 class Test : public Singleton<Test> {
 public:
-	void Set(int i);
+	void Set(const int& i);
 	int Get() const;
 
 private:
